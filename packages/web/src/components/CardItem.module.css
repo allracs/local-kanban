@@ -1,0 +1,67 @@
+/* Grid wrapper enables the height-grow animation: a single row sized 1fr that we
+   animate from 0fr, which grows the card to its natural height without measuring. */
+.cardWrap {
+  display: grid;
+  grid-template-rows: 1fr;
+  min-height: 0;
+}
+
+/* Plays whenever a card mounts into a section — including when the dragged card
+   crosses into a new day-section (it remounts there), so the projection grows
+   from zero height and pushes the section's other cards down. */
+.cardWrapEnter {
+  animation: cardWrapEnter 0.2s ease;
+}
+
+@keyframes cardWrapEnter {
+  from { grid-template-rows: 0fr; }
+  to   { grid-template-rows: 1fr; }
+}
+
+.card {
+  background: #fff;
+  border-radius: var(--card-radius);
+  padding: 12px 14px;
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+  user-select: none;
+  overflow: hidden;
+  min-height: 0;
+  transition: box-shadow 0.15s;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.cardRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.priorityIcon {
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.tag {
+  font-size: 11px;
+  background: #eef2ff;
+  color: var(--accent);
+  border-radius: 4px;
+  padding: 2px 6px;
+}

@@ -1,0 +1,257 @@
+.column {
+  width: var(--col-width);
+  min-width: var(--col-width);
+  background: #e8ebf0;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: background 0.15s;
+}
+
+.over {
+  background: #dde3ec;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+}
+
+.dragHandle {
+  background: none;
+  border: none;
+  cursor: grab;
+  font-size: 16px;
+  color: #aaa;
+  padding: 0 2px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: color 0.1s;
+  touch-action: none;
+  flex-shrink: 0;
+}
+
+.dragHandle:hover {
+  color: #555;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.count {
+  font-size: 12px;
+  background: #c8cdd6;
+  border-radius: 10px;
+  padding: 1px 7px;
+  color: #555;
+  margin-left: auto;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 40px;
+}
+
+.empty {
+  font-size: 13px;
+  color: #999;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.addBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #666;
+  padding: 6px 4px;
+  text-align: left;
+  border-radius: 6px;
+  transition: background 0.1s, color 0.1s;
+}
+
+.addBtn:hover {
+  background: rgba(0,0,0,.06);
+  color: #1a1a2e;
+}
+
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.addInput {
+  width: 100%;
+  box-sizing: border-box;
+  border: 2px solid #4c9aff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  background: #fff;
+  outline: none;
+  line-height: 1.4;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.menuWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.menuBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #aaa;
+  padding: 0 4px;
+  line-height: 1;
+  border-radius: 4px;
+}
+
+.menuBtn:hover { color: #555; }
+
+.menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 10;
+  background: #fff;
+  border: 1px solid #d6dae2;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  min-width: 168px;
+}
+
+.menuItem {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: #1a1a2e;
+  white-space: nowrap;
+}
+
+.menuItem:hover { background: rgba(0,0,0,.06); }
+.menuItemActive { font-weight: 600; color: #2563eb; }
+
+.dayGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dayHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 2px 2px;
+  position: sticky;
+  top: 0;
+}
+
+.dayLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+}
+
+.dayCount {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.dayCards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 8px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.dayOver { background: #d7e3fb; }
+
+.dayDrop {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 0;
+  min-height: 8px;
+  border: 1px dashed transparent;
+  border-radius: 8px;
+  /* Springy easing so the box grows/shrinks with a little bounce. */
+  transition:
+    min-height 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    padding 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+/* Visible "drop box" state — fades in when a drag starts, out on drop. */
+.dayDropActive {
+  padding: 6px;
+  min-height: 40px;
+  border-color: #c2c8d2;
+  animation: dropBoxIn 0.22s ease both;
+}
+
+@keyframes dropBoxIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.dayHint {
+  font-size: 12px;
+  color: #aab;
+  text-align: center;
+  padding: 2px 0;
+  /* Gently pulse to invite a drop. */
+  animation: dayHintPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dayHintPulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+.dayDropOver {
+  background: #d7e3fb;
+  border-color: #4c9aff;
+  box-shadow: 0 0 0 3px rgba(76, 154, 255, 0.16);
+  animation: dropOverPop 0.18s ease;
+}
+
+@keyframes dropOverPop {
+  from { box-shadow: 0 0 0 0 rgba(76, 154, 255, 0.16); }
+  to { box-shadow: 0 0 0 3px rgba(76, 154, 255, 0.16); }
+}
