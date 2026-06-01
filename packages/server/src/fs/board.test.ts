@@ -43,6 +43,25 @@ describe("bootstrapIfNeeded", () => {
     expect(cols.sort()).toEqual(["doing", "done", "todo"]);
     await fs.rm(ws, { recursive: true });
   });
+
+  it("writes .column-order so default columns are todo/doing/done", async () => {
+    const ws = await tmpWorkspace();
+    await bootstrapIfNeeded(ws);
+    const board = await readBoard(ws);
+    expect(board.columns.map((c) => c.name)).toEqual(["todo", "doing", "done"]);
+    await fs.rm(ws, { recursive: true });
+  });
+
+  it("does not overwrite an existing .column-order", async () => {
+    const ws = await tmpWorkspace();
+    await bootstrapIfNeeded(ws);
+    const orderPath = path.join(ws, ".kanban", ".column-order");
+    await fs.writeFile(orderPath, "done\ntodo\ndoing\n", "utf8");
+    await bootstrapIfNeeded(ws);
+    const board = await readBoard(ws);
+    expect(board.columns.map((c) => c.name)).toEqual(["done", "todo", "doing"]);
+    await fs.rm(ws, { recursive: true });
+  });
 });
 
 describe("createCard + readBoard", () => {

@@ -3,8 +3,11 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
+  closestCorners,
+  pointerWithin,
   useSensor,
   useSensors,
+  type CollisionDetection,
   type DragEndEvent,
   type DragOverEvent,
   type DragStartEvent,
@@ -22,6 +25,31 @@ interface Props {
   board: BoardState;
   onBoardChange: (board: BoardState) => void;
 }
+
+// dnd-kit's default rectIntersection only registers a drop when the dragged
+// card's box physically overlaps a target's box. Because columns are sized to
+// their content (align-items: flex-start), an empty column is short, so a card
+// dragged across from a tall column never overlaps it and can't be dropped.
+//
+// Instead, prefer whatever droppable the pointer is actually over (precise, and
+// preserves the tuned per-day-section targeting), and only fall back to the
+// nearest droppable by distance when the pointer is in a gap (e.g. beside a
+// short empty column). We scope by drag type so a column drag only collides
+// with other columns, never with the cards nested inside them.
+const collisionDetection: CollisionDetection = (args) => {
+  const draggingColumn = args.active.data.current?.type === "column";
+  const containers = args.droppableContainers.filter((c) =>
+    draggingColumn
+      ? c.data.current?.type === "column"
+      : c.data.current?.type !== "column"
+  );
+  const scoped = { ...args, droppableContainers: containers };
+  if (!draggingColumn) {
+    const pointerHits = pointerWithin(scoped);
+    if (pointerHits.length > 0) return pointerHits;
+  }
+  return closestCorners(scoped);
+};
 
 export function Board({ board, onBoardChange }: Props) {
   const [activeCard, setActiveCard] = useState<Card | null>(null);
@@ -116,7 +144,21 @@ export function Board({ board, onBoardChange }: Props) {
       targetIndex = col ? col.cardIds.length : 0;
     }
 
-    const finalBoard = applyMove(board, cardId, targetColumn, targetIndex);
+    let finalBoard = applyMove(board, cardId, targetColumn, targetIndex);
+    // Moving into a completed-grouped column (e.g. Done) marks the card completed
+    // today on the server; stamp it optimistically so it buckets under "Today"
+    // immediately instead of flashing under "No date" until the next sync.
+    const targetCol = finalBoard.columns.find((c) => c.name === targetColumn);
+    if (targetCol?.groupBy === "completed" && card.column !== targetColumn) {
+      const moved = finalBoard.cards[cardId];
+      finalBoard = {
+        ...finalBoard,
+        cards: {
+          ...finalBoard.cards,
+          [cardId]: { ...moved, frontmatter: { ...moved.frontmatter, completed: localDateString() } },
+        },
+      };
+    }
     onBoardChange(finalBoard);
 
     const finalIndex = finalBoard.columns
@@ -172,7 +214,7 @@ export function Board({ board, onBoardChange }: Props) {
 
   return (
     <>
-      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
         <SortableContext items={board.columns.map((c) => "col:" + c.name)} strategy={horizontalListSortingStrategy}>
           <div className={styles.board}>
             {board.columns.map((col) => (

@@ -13,6 +13,7 @@ export interface KanbanConfig {
 }
 
 const VALID_GROUP_BY: GroupBy[] = ["none", "scheduled", "completed"];
+const DEFAULT_COLUMNS = ["todo", "doing", "done"];
 
 export async function readConfig(kanbanRoot: string): Promise<KanbanConfig> {
   try {
@@ -44,7 +45,7 @@ export async function getKanbanRoot(workspace: string): Promise<string> {
 export async function bootstrapIfNeeded(workspace: string): Promise<void> {
   const root = await getKanbanRoot(workspace);
   await fs.mkdir(root, { recursive: true });
-  for (const col of ["todo", "doing", "done"]) {
+  for (const col of DEFAULT_COLUMNS) {
     const colPath = path.join(root, col);
     await fs.mkdir(colPath, { recursive: true });
     const orderPath = path.join(colPath, ORDER_FILE);
@@ -53,6 +54,12 @@ export async function bootstrapIfNeeded(workspace: string): Promise<void> {
     } catch {
       await fs.writeFile(orderPath, "", "utf8");
     }
+  }
+  const columnOrderPath = path.join(root, COLUMN_ORDER_FILE);
+  try {
+    await fs.access(columnOrderPath);
+  } catch {
+    await fs.writeFile(columnOrderPath, DEFAULT_COLUMNS.join("\n") + "\n", "utf8");
   }
   const configPath = path.join(root, CONFIG_FILE);
   try {

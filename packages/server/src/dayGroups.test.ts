@@ -59,7 +59,14 @@ describe("computeDayGroups - scheduled", () => {
 
 describe("computeDayGroups - completed", () => {
   const today = "2026-05-29";
-  it("shows only non-empty groups, most-recent first, undated last, none droppable", () => {
+
+  it("always shows a droppable Today so cards can be moved into Done", () => {
+    const groups = computeDayGroups([], "completed", today);
+    expect(groups.map((g) => g.key)).toEqual(["today"]);
+    expect(groups[0].droppable).toBe(true);
+  });
+
+  it("shows non-empty groups most-recent first, undated last; only Today droppable", () => {
     const cards = [
       card("old", { completed: "2026-05-27" }),
       card("done1", { completed: "2026-05-29" }),
@@ -73,6 +80,8 @@ describe("computeDayGroups - completed", () => {
     expect(groups.map((g) => g.label)).toEqual([
       "Today", "Yesterday", "Wed May 27", "No date",
     ]);
-    expect(groups.every((g) => g.droppable === false)).toBe(true);
+    // Today accepts drops (completing a card stamps today); the rest are display-only.
+    expect(groups.find((g) => g.key === "today")!.droppable).toBe(true);
+    expect(groups.filter((g) => g.key !== "today").every((g) => g.droppable === false)).toBe(true);
   });
 });

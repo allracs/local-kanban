@@ -117,7 +117,9 @@ export function computeDayGroups(
     else push(d, c.id);
   }
   const groups: DayGroup[] = [];
-  if (byKey.has("today")) groups.push({ key: "today", label: "Today", droppable: false, cardIds: byKey.get("today")! });
+  // Today is always droppable: dropping a card into a completed-grouped column
+  // (e.g. Done) marks it completed today, so the card lands here.
+  groups.push({ key: "today", label: "Today", droppable: true, cardIds: byKey.get("today") ?? [] });
   if (byKey.has("yesterday")) groups.push({ key: "yesterday", label: "Yesterday", droppable: false, cardIds: byKey.get("yesterday")! });
   const pastDates = [...byKey.keys()].filter((k) => /^\d{4}-\d{2}-\d{2}$/.test(k) && k !== today && k !== yesterday).sort().reverse();
   for (const k of pastDates) groups.push({ key: k, label: dateLabel(k), droppable: false, cardIds: byKey.get(k)! });
