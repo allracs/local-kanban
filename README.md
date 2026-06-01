@@ -2,6 +2,8 @@
 
 A local-first kanban board for developers. Cards live as plain `.md` files inside your project — edit them in your IDE, move them on the board, or let an AI assistant write them directly.
 
+![App screenshot](docs/images/app-screenshot.png)
+
 ```
 your-project/
 └── .kanban/
